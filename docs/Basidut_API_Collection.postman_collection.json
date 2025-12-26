@@ -1,0 +1,544 @@
+{
+    "info": {
+        "_postman_id": "basidut-api-collection",
+        "name": "Basidut API - Tugas Besar Basis Data Lanjut",
+        "description": "Complete API testing collection for Basidut e-commerce system.\n\nIncludes tests for:\n- Authentication (Register, Login, Logout)\n- Product CRUD (with JOIN queries)\n- Order Management (Stored Procedure with ACID Transaction)\n- Shipping Monitoring (Database View)\n- Audit Logs (Database Trigger)\n\nBase URL: http://127.0.0.1:8000/api",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Authentication",
+            "item": [
+                {
+                    "name": "1.1 Register New User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"kata_sandi\": \"password123\",\n    \"nama_lengkap\": \"Test User\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user account.\n\nExpected Response (201):\n- User created with bcrypt hashed password\n- Returns user data"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "1.2 Login - Get JWT Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save token to environment variable",
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.token) {",
+                                    "    pm.environment.set(\"jwt_token\", jsonData.token);",
+                                    "    console.log(\"Token saved:\", jsonData.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"user1@mail.com\",\n    \"kata_sandi\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "login"
+                            ]
+                        },
+                        "description": "Login with seeded user credentials.\n\nTest Accounts:\n- user1@mail.com to user100@mail.com\n- Password: password123\n\nExpected Response (200):\n- JWT token (auto-saved to environment)\n- User data"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "1.3 Get Current User Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/me",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "me"
+                            ]
+                        },
+                        "description": "Get authenticated user's profile.\n\nRequires: JWT token in Authorization header"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "1.4 Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "logout"
+                            ]
+                        },
+                        "description": "Logout and invalidate JWT token."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Authentication endpoints using JWT tokens"
+        },
+        {
+            "name": "2. Products (CRUD)",
+            "item": [
+                {
+                    "name": "2.1 Get All Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/produk",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "produk"
+                            ]
+                        },
+                        "description": "Get list of all products.\n\nPublic endpoint - no authentication required.\n\nExpected: 3 seeded products"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.2 Get Single Product",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/produk/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "produk",
+                                "1"
+                            ]
+                        },
+                        "description": "Get details of a specific product by ID.\n\nPublic endpoint - no authentication required."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.3 Create Product",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nama\": \"Mouse Gaming RGB\",\n    \"harga\": 350000,\n    \"sku\": \"MSE-001\",\n    \"stok\": 75,\n    \"kategori_id\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/produk",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "produk"
+                            ]
+                        },
+                        "description": "Create a new product.\n\nRequires: JWT authentication\n\nValidation:\n- harga >= 0 (CHECK constraint)\n- stok >= 0 (CHECK constraint)\n- sku must be unique\n- kategori_id must exist (FOREIGN KEY)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.4 Update Product",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nama\": \"Mouse Gaming RGB Pro\",\n    \"harga\": 400000,\n    \"stok\": 80\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/produk/4",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "produk",
+                                "4"
+                            ]
+                        },
+                        "description": "Update an existing product.\n\nRequires: JWT authentication\n\nNote: Change product ID in URL to match created product"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.5 Delete Product",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/produk/4",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "produk",
+                                "4"
+                            ]
+                        },
+                        "description": "Delete a product.\n\nRequires: JWT authentication"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Product CRUD operations with database constraints"
+        },
+        {
+            "name": "3. Orders (Stored Procedure)",
+            "item": [
+                {
+                    "name": "3.1 Create Order - Test Stored Procedure",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"product_id\": 1,\n    \"qty\": 2,\n    \"courier\": \"JNE\",\n    \"address\": \"Jl. Sudirman No. 123, Jakarta Pusat\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pesanan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pesanan"
+                            ]
+                        },
+                        "description": "Create order using stored procedure sp_buat_pesanan_enterprise.\n\nTests:\n✅ ACID Transaction (BEGIN/COMMIT/ROLLBACK)\n✅ Row Locking (FOR UPDATE)\n✅ Stock Validation\n✅ Multi-table Insert (pesanan, item_pesanan, pengiriman)\n✅ Trigger fires (logs to log_audit)\n\nExpected:\n- Order created\n- Stock reduced\n- Audit log entry created"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3.2 Create Order - Test Stock Validation",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"product_id\": 1,\n    \"qty\": 9999,\n    \"courier\": \"JNE\",\n    \"address\": \"Test Address\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pesanan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pesanan"
+                            ]
+                        },
+                        "description": "Test stock validation in stored procedure.\n\nExpected Response (400):\n- Error: \"Stok Tidak Mencukupi\"\n- Transaction rolled back\n- No data inserted"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3.3 Get User's Orders (JOIN Query)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/pesanan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pesanan"
+                            ]
+                        },
+                        "description": "Get all orders for authenticated user.\n\nUses JOIN query:\n- pesanan LEFT JOIN pengiriman\n- pesanan LEFT JOIN item_pesanan\n- item_pesanan LEFT JOIN produk\n\nTests: Complex JOIN queries"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3.4 Get Single Order Details",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/pesanan/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "pesanan",
+                                "1"
+                            ]
+                        },
+                        "description": "Get detailed order information.\n\nIncludes:\n- Order data\n- Order items with product details\n- Shipping information\n\nTests: Eloquent relationships and eager loading"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Order management using stored procedure with ACID transactions"
+        },
+        {
+            "name": "4. Advanced Features",
+            "item": [
+                {
+                    "name": "4.1 Shipping Monitoring (View)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/monitoring-pengiriman",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "monitoring-pengiriman"
+                            ]
+                        },
+                        "description": "Get shipping monitoring data.\n\nTests: Database VIEW\n- Uses v_monitoring_pengiriman view\n- Joins multiple tables\n- Real-time data aggregation"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4.2 Audit Logs (Trigger)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{jwt_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/audit-logs",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "audit-logs"
+                            ]
+                        },
+                        "description": "Get audit logs for stock changes.\n\nTests: Database TRIGGER\n- Populated by trg_audit_stok_update trigger\n- Automatically logs stock changes\n- Shows old and new stock values"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Advanced database features: View and Trigger"
+        },
+        {
+            "name": "5. Health Check",
+            "item": [
+                {
+                    "name": "5.1 API Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        },
+                        "description": "Check if API is running.\n\nPublic endpoint - no authentication required."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "System health check"
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "jwt_token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

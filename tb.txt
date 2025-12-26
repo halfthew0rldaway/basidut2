@@ -1,0 +1,118 @@
+Saat ini proyek sudah menggunakan Laravel dan struktur dasar sudah tersedia.
+Jangan membuat ulang project atau arsitektur baru.
+Tugas Anda adalah memperbaiki, melengkapi, dan menyesuaikan implementasi yang ada agar selaras dengan instruksi tugas besar Basis Data Lanjut, dengan fokus utama pada API dan query database, bukan pada tampilan web atau frontend.
+
+Ruang Lingkup yang HARUS Dikerjakan
+
+Fokus pekerjaan hanya mencakup:
+
+Desain dan perbaikan skema database
+
+Query SQL dan optimasinya
+
+Endpoint API (REST) yang dapat diuji melalui Postman
+
+Implementasi fitur advanced database
+
+Audit, logging, dan transaksi database
+
+Abaikan sepenuhnya:
+
+Blade / UI / CSS
+
+Tampilan web
+
+UX atau frontend logic
+
+Instruksi Teknis Detail (INI PENTING)
+1. Database & Skema
+
+Evaluasi database yang sudah ada, lalu:
+
+Pastikan memenuhi minimal 10 entitas
+
+Terapkan relasi 1–1, 1–N, dan N–N
+
+Normalisasi hingga 3NF
+
+Pastikan setiap modul terwakili sesuai konsep Domain Driven Design (DDD) dan bounded context
+
+Tambahkan primary key, foreign key, unique, index, dan check constraint
+
+2. Advanced Database Features (WAJIB ADA)
+
+Implementasikan dan pastikan digunakan secara nyata:
+
+1 Stored Procedure
+
+1 Function
+
+1 Trigger (disarankan untuk audit/log)
+
+1 View (laporan atau agregasi)
+
+1 Database Transaction (BEGIN–COMMIT–ROLLBACK)
+
+Semua harus bisa diuji melalui query SQL, bukan sekadar contoh.
+
+3. API & Query (FOKUS UTAMA)
+
+Perbaiki dan lengkapi API Laravel berbasis REST agar:
+
+Minimal 3 modul memiliki CRUD API lengkap
+
+Endpoint menggunakan query JOIN dan subquery
+
+Proses sensitif (misal transaksi) menggunakan database transaction
+
+Semua endpoint dapat diuji melalui Postman
+
+Sertakan:
+
+Contoh endpoint
+
+Contoh request & response JSON
+
+Query SQL yang digunakan di balik endpoint
+
+4. Audit & Logging
+
+Bangun atau benahi modul logging agar:
+
+Setiap INSERT, UPDATE, DELETE tercatat
+
+Log mencatat waktu, aksi, dan referensi data
+
+Disarankan menggunakan trigger database
+
+5. Optimasi & Analisis Performa
+
+Lakukan analisis performa dengan:
+
+Indexing pada kolom kritis
+
+EXPLAIN atau EXPLAIN ANALYZE pada query penting
+
+Evaluasi dan optimasi JOIN atau subquery
+
+Dokumentasikan hasil optimasi (sebelum & sesudah)
+
+Output yang DIHARAPKAN
+
+Hasil akhir harus mencakup:
+
+Skema database final (SQL)
+
+Daftar endpoint API yang dapat diuji di Postman
+
+Query SQL utama (CRUD, transaksi, laporan)
+
+Implementasi advanced database
+
+Penjelasan singkat interaksi antar modul
+
+Tidak perlu frontend, tampilan web, atau fitur visual.
+
+
+Fokuskan solusi pada database correctness, query quality, dan API testability, bukan pada fitur Laravel secara visual.
+Asumsikan aplikasi digunakan sebagai backend service, bukan aplikasi web UI.
