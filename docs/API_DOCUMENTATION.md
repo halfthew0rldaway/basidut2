@@ -1,27 +1,56 @@
-# Basidut API Documentation
+# Dokumentasi API Basidut
 
 ## Base URL
 ```
 http://127.0.0.1:8000/api
 ```
 
-## Authentication
-The API uses **JWT (JSON Web Token)** authentication. After logging in, you'll receive a token that must be included in the `Authorization` header for protected endpoints.
+## Autentikasi
+API ini menggunakan autentikasi **JWT (JSON Web Token)**. Setelah login, Anda akan menerima token yang harus disertakan dalam header `Authorization` untuk endpoint yang terproteksi.
 
+### Konfigurasi JWT
+- **Algorithm**: HS256 (HMAC with SHA-256)
+- **Token Type**: Bearer
+- **Token Lifetime**: Dapat dikonfigurasi (default: 60 menit)
+- **Refresh**: Didukung melalui mekanisme refresh token
+
+### Cara Kerja JWT
+1. **Login**: Pengguna mengirim kredensial → Server memvalidasi → Mengembalikan token JWT
+2. **Request**: Client menyertakan token dalam header `Authorization: Bearer {token}`
+3. **Validasi**: Server memverifikasi signature token menggunakan secret key
+4. **Response**: Jika valid, memproses request; jika invalid/expired, mengembalikan 401
+
+### Struktur Token
 ```
-Authorization: Bearer {your-jwt-token}
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbGFyYXZlbC5kZXYvYXBpL2xvZ2luIiwiaWF0IjoxNjQ2MzI5MjAwLCJleHAiOjE2NDYzMzI4MDAsIm5iZiI6MTY0NjMyOTIwMCwianRpIjoiVGRqRlhXRjlTcEVNV0lIZiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.signature
+```
+
+**Bagian-bagian:**
+- **Header**: Algorithm & tipe token (HS256, JWT)
+- **Payload**: Data pengguna (id, email, exp, iat)
+- **Signature**: HMAC-SHA256(header + payload + secret)
+
+### Fitur Keamanan
+- ✅ **Verifikasi Signature**: Mencegah manipulasi token
+- ✅ **Expiration**: Token otomatis expired setelah waktu yang ditentukan
+- ✅ **Secret Key**: Disimpan aman di `.env` (JWT_SECRET)
+- ✅ **Stateless**: Tidak memerlukan penyimpanan session
+
+### Menggunakan Token
+```
+Authorization: Bearer {token-jwt-anda}
 ```
 
 ---
 
-## 📋 API Endpoints
+## 📋 Daftar Endpoint API
 
-### 🔓 Public Endpoints (No Authentication Required)
+### 🔓 Endpoint Publik (Tidak Memerlukan Autentikasi)
 
-#### 1. Register New User
+#### 1. Registrasi Pengguna Baru
 **POST** `/api/register`
 
-Register a new user account.
+Mendaftarkan akun pengguna baru.
 
 **Request Body:**
 ```json
@@ -53,7 +82,7 @@ Register a new user account.
 #### 2. Login
 **POST** `/api/login`
 
-Login and receive a JWT token.
+Login dan menerima token JWT.
 
 **Request Body:**
 ```json
@@ -79,10 +108,10 @@ Login and receive a JWT token.
 
 ---
 
-#### 3. Get All Products
+#### 3. Dapatkan Semua Produk
 **GET** `/api/produk`
 
-Get list of all available products.
+Mendapatkan daftar semua produk yang tersedia.
 
 **Response (200 OK):**
 ```json
@@ -112,10 +141,10 @@ Get list of all available products.
 
 ---
 
-#### 4. Get Single Product
+#### 4. Dapatkan Detail Produk
 **GET** `/api/produk/{id}`
 
-Get details of a specific product.
+Mendapatkan detail produk tertentu.
 
 **Response (200 OK):**
 ```json
@@ -137,7 +166,7 @@ Get details of a specific product.
 #### 5. Health Check
 **GET** `/api/health`
 
-Check if the API is running.
+Memeriksa apakah API berjalan dengan baik.
 
 **Response (200 OK):**
 ```json
@@ -151,18 +180,18 @@ Check if the API is running.
 
 ---
 
-### 🔒 Protected Endpoints (Authentication Required)
+### 🔒 Endpoint Terproteksi (Memerlukan Autentikasi)
 
-> **Note:** All protected endpoints require the `Authorization: Bearer {token}` header.
+> **Catatan:** Semua endpoint terproteksi memerlukan header `Authorization: Bearer {token}`.
 
-#### 6. Get Current User Profile
+#### 6. Dapatkan Profil Pengguna Saat Ini
 **GET** `/api/me`
 
-Get authenticated user's profile information.
+Mendapatkan informasi profil pengguna yang sedang login.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -184,11 +213,11 @@ Authorization: Bearer {your-jwt-token}
 #### 7. Logout
 **POST** `/api/logout`
 
-Logout and invalidate the current JWT token.
+Logout dan membatalkan token JWT saat ini.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -201,20 +230,21 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 8. Create New Product
+#### 8. Buat Produk Baru
 **POST** `/api/produk`
 
-Create a new product (Admin only).
+Membuat produk baru (khusus Admin).
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
+Content-Type: application/json
 ```
 
 **Request Body:**
 ```json
 {
-  "nama": "New Product",
+  "nama": "Produk Baru",
   "harga": 500000,
   "sku": "NP-001",
   "stok": 100,
@@ -229,7 +259,7 @@ Authorization: Bearer {your-jwt-token}
   "message": "Produk Berhasil Ditambahkan",
   "data": {
     "id": 4,
-    "nama": "New Product",
+    "nama": "Produk Baru",
     "harga": "500000.00",
     "sku": "NP-001",
     "stok": 100,
@@ -240,20 +270,21 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 9. Update Product
+#### 9. Perbarui Produk
 **PUT** `/api/produk/{id}`
 
-Update an existing product.
+Memperbarui produk yang sudah ada.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
+Content-Type: application/json
 ```
 
 **Request Body:**
 ```json
 {
-  "nama": "Updated Product Name",
+  "nama": "Nama Produk Diperbarui",
   "harga": 550000,
   "stok": 120
 }
@@ -266,7 +297,7 @@ Authorization: Bearer {your-jwt-token}
   "message": "Produk Berhasil Diperbarui",
   "data": {
     "id": 4,
-    "nama": "Updated Product Name",
+    "nama": "Nama Produk Diperbarui",
     "harga": "550000.00",
     "sku": "NP-001",
     "stok": 120,
@@ -277,14 +308,14 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 10. Delete Product
+#### 10. Hapus Produk
 **DELETE** `/api/produk/{id}`
 
-Delete a product.
+Menghapus produk.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -297,14 +328,14 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 11. Get User's Order History
+#### 11. Dapatkan Riwayat Pesanan Pengguna
 **GET** `/api/pesanan`
 
-Get all orders for the authenticated user.
+Mendapatkan semua pesanan untuk pengguna yang sedang login.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -331,14 +362,14 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 12. Get Single Order Details
+#### 12. Dapatkan Detail Pesanan
 **GET** `/api/pesanan/{id}`
 
-Get detailed information about a specific order.
+Mendapatkan informasi detail tentang pesanan tertentu.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -371,7 +402,7 @@ Authorization: Bearer {your-jwt-token}
       "pesanan_id": 1,
       "kurir": "JNE",
       "nomor_resi": "JNE123456789",
-      "alamat_tujuan": "Jl. Example No. 123",
+      "alamat_tujuan": "Jl. Contoh No. 123",
       "status_pengiriman": "terkirim"
     }
   }
@@ -380,14 +411,15 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 13. Create New Order
+#### 13. Buat Pesanan Baru
 **POST** `/api/pesanan`
 
-Create a new order using the stored procedure `sp_buat_pesanan_enterprise`.
+Membuat pesanan baru menggunakan stored procedure `sp_buat_pesanan_enterprise`.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
+Content-Type: application/json
 ```
 
 **Request Body:**
@@ -396,7 +428,7 @@ Authorization: Bearer {your-jwt-token}
   "product_id": 1,
   "qty": 2,
   "courier": "JNE",
-  "address": "Jl. Example No. 123, Jakarta"
+  "address": "Jl. Contoh No. 123, Jakarta"
 }
 ```
 
@@ -419,14 +451,14 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 14. Get Shipping Monitoring
+#### 14. Dapatkan Monitoring Pengiriman
 **GET** `/api/monitoring-pengiriman`
 
-Get shipping monitoring data using the database view `v_monitoring_pengiriman`.
+Mendapatkan data monitoring pengiriman menggunakan database view `v_monitoring_pengiriman`.
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -452,14 +484,14 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-#### 15. Get Audit Logs
+#### 15. Dapatkan Log Audit
 **GET** `/api/audit-logs`
 
-Get audit logs for stock changes (Admin only - consider adding admin middleware).
+Mendapatkan log audit untuk perubahan stok (khusus Admin - pertimbangkan menambahkan middleware admin).
 
 **Headers:**
 ```
-Authorization: Bearer {your-jwt-token}
+Authorization: Bearer {token-jwt-anda}
 ```
 
 **Response (200 OK):**
@@ -482,11 +514,11 @@ Authorization: Bearer {your-jwt-token}
 
 ---
 
-## 🔧 Testing the API
+## 🔧 Menguji API
 
-### Using cURL
+### Menggunakan cURL
 
-#### 1. Register
+#### 1. Registrasi
 ```bash
 curl -X POST http://127.0.0.1:8000/api/register \
   -H "Content-Type: application/json" \
@@ -508,33 +540,33 @@ curl -X POST http://127.0.0.1:8000/api/login \
   }'
 ```
 
-#### 3. Get Products (Public)
+#### 3. Dapatkan Produk (Publik)
 ```bash
 curl http://127.0.0.1:8000/api/produk
 ```
 
-#### 4. Get User Profile (Protected)
+#### 4. Dapatkan Profil Pengguna (Terproteksi)
 ```bash
 curl http://127.0.0.1:8000/api/me \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+  -H "Authorization: Bearer TOKEN_JWT_ANDA_DI_SINI"
 ```
 
-#### 5. Create Order (Protected)
+#### 5. Buat Pesanan (Terproteksi)
 ```bash
 curl -X POST http://127.0.0.1:8000/api/pesanan \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -H "Authorization: Bearer TOKEN_JWT_ANDA_DI_SINI" \
   -H "Content-Type: application/json" \
   -d '{
     "product_id": 1,
     "qty": 1,
     "courier": "JNE",
-    "address": "Jl. Example No. 123"
+    "address": "Jl. Contoh No. 123"
   }'
 ```
 
 ---
 
-## 📝 Error Responses
+## 📝 Response Error
 
 ### 401 Unauthorized
 ```json
@@ -570,33 +602,33 @@ curl -X POST http://127.0.0.1:8000/api/pesanan \
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Memulai dengan Cepat
 
-1. **Start the Laravel server:**
+1. **Jalankan server Laravel:**
    ```bash
    php artisan serve
    ```
 
-2. **Test the health endpoint:**
+2. **Uji endpoint health:**
    ```bash
    curl http://127.0.0.1:8000/api/health
    ```
 
-3. **Login with a test account:**
+3. **Login dengan akun pengujian:**
    ```bash
    curl -X POST http://127.0.0.1:8000/api/login \
      -H "Content-Type: application/json" \
      -d '{"email": "user1@mail.com", "kata_sandi": "password123"}'
    ```
 
-4. **Use the returned token for authenticated requests!**
+4. **Gunakan token yang dikembalikan untuk request yang terautentikasi!**
 
 ---
 
-## 📚 Additional Notes
+## 📚 Catatan Tambahan
 
-- All timestamps are in ISO 8601 format
-- All monetary values are in Indonesian Rupiah (IDR)
-- The API uses the stored procedure `sp_buat_pesanan_enterprise` for order creation
-- Stock changes are automatically logged via database triggers
-- The `v_monitoring_pengiriman` view provides real-time shipping monitoring
+- Semua timestamp dalam format ISO 8601
+- Semua nilai moneter dalam Rupiah Indonesia (IDR)
+- API menggunakan stored procedure `sp_buat_pesanan_enterprise` untuk pembuatan pesanan
+- Perubahan stok dicatat secara otomatis melalui database trigger
+- View `v_monitoring_pengiriman` menyediakan monitoring pengiriman real-time

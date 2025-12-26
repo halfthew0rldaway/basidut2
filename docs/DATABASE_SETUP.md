@@ -1,76 +1,76 @@
-# Database Setup Guide
+# Panduan Setup Database
 
-## ⚠️ Important Issue Found
+## ⚠️ Masalah Penting yang Ditemukan
 
-The `basidut.sql` file has **plain text passwords** (`password123`), but Laravel requires **bcrypt hashed passwords**. This is why login fails even after importing the database.
+File `basidut.sql` memiliki **password teks biasa** (`password123`), tetapi Laravel memerlukan **password yang di-hash dengan bcrypt**. Inilah mengapa login gagal bahkan setelah mengimpor database.
 
-## 🔧 Solution: Two Options
+## 🔧 Solusi: Dua Pilihan
 
-### Option 1: Import Database + Update Passwords (Recommended)
+### Pilihan 1: Impor Database + Perbarui Password (Disarankan)
 
-#### Step 1: Import the SQL File
+#### Langkah 1: Impor File SQL
 ```bash
-# Using MySQL command line
+# Menggunakan command line MySQL
 mysql -u root -p < basidut.sql
 
-# Or using HeidiSQL:
-# 1. Open HeidiSQL
-# 2. Connect to your MySQL server
-# 3. File > Run SQL file > Select basidut.sql
-# 4. Click Execute
+# Atau menggunakan HeidiSQL:
+# 1. Buka HeidiSQL
+# 2. Sambungkan ke server MySQL Anda
+# 3. File > Run SQL file > Pilih basidut.sql
+# 4. Klik Execute
 ```
 
-#### Step 2: Update Passwords to Bcrypt Hash
-After importing, run this SQL to update all passwords to bcrypt hashed version:
+#### Langkah 2: Perbarui Password ke Hash Bcrypt
+Setelah mengimpor, jalankan SQL ini untuk memperbarui semua password ke versi hash bcrypt:
 
 ```sql
 USE basidut;
 
--- Update all user passwords to bcrypt hash of 'password123'
+-- Perbarui semua password pengguna ke hash bcrypt dari 'password123'
 -- Hash: $2y$12$bz3jN1tD/7AAwNFO6k2ln.jxnxuAC9A3qGkAiirQ4/fs2z9wE9/XK
 UPDATE pengguna 
 SET kata_sandi = '$2y$12$bz3jN1tD/7AAwNFO6k2ln.jxnxuAC9A3qGkAiirQ4/fs2z9wE9/XK';
 ```
 
-#### Step 3: Verify
+#### Langkah 3: Verifikasi
 ```sql
--- Check if passwords are updated
+-- Periksa apakah password sudah diperbarui
 SELECT id, username, email, LEFT(kata_sandi, 20) as password_hash 
 FROM pengguna 
 LIMIT 5;
 ```
 
-### Option 2: Use Laravel Seeder (Alternative)
+### Pilihan 2: Gunakan Laravel Seeder (Alternatif)
 
-Create a seeder to populate the database with proper bcrypt passwords:
+Buat seeder untuk mengisi database dengan password bcrypt yang benar:
 
 ```bash
 php artisan make:seeder PenggunaSeeder
 ```
 
-Then run:
+Kemudian jalankan:
 ```bash
 php artisan db:seed --class=PenggunaSeeder
 ```
 
-## ✅ After Setup
+## ✅ Setelah Setup
 
-1. **Verify .env database connection:**
+1. **Verifikasi koneksi database di .env:**
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=basidut
 DB_USERNAME=root
-DB_PASSWORD=your_mysql_password
+DB_PASSWORD=password_mysql_anda
 ```
 
-2. **Clear config cache:**
+2. **Bersihkan cache konfigurasi:**
 ```bash
 php artisan config:clear
 ```
 
-3. **Test login in Postman:**
+3. **Uji login di Postman:**
    - URL: `POST http://127.0.0.1:8000/api/login`
    - Body (JSON):
    ```json
@@ -80,12 +80,12 @@ php artisan config:clear
    }
    ```
 
-## 🔑 Test Accounts
+## 🔑 Akun Pengujian
 
-After fixing passwords, you can login with:
-- Email: `user1@mail.com` to `user100@mail.com`
+Setelah memperbaiki password, Anda dapat login dengan:
+- Email: `user1@mail.com` sampai `user100@mail.com`
 - Password: `password123`
 
-Or the admin account:
+Atau akun admin:
 - Email: `basidut@jokowi.com`
 - Password: `password123`

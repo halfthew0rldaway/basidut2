@@ -1,7 +1,7 @@
-# API Testing Guide - Postman Collection
+# Panduan Pengujian API - Postman Collection
 
-## 🎯 Overview
-This guide provides complete API testing scenarios for the Basidut e-commerce system, focusing on database features and API endpoints.
+## 🎯 Ringkasan
+Panduan ini menyediakan skenario pengujian API lengkap untuk sistem e-commerce Basidut, dengan fokus pada fitur database dan endpoint API.
 
 ## 📦 Postman Collection
 
@@ -12,9 +12,9 @@ http://127.0.0.1:8000/api
 
 ---
 
-## 1️⃣ Authentication Tests
+## 1️⃣ Pengujian Autentikasi
 
-### 1.1 Register New User
+### 1.1 Registrasi Pengguna Baru
 **POST** `/api/register`
 
 **Body (JSON):**
@@ -27,7 +27,7 @@ http://127.0.0.1:8000/api
 }
 ```
 
-**Expected Response (201):**
+**Respons yang Diharapkan (201):**
 ```json
 {
     "success": true,
@@ -44,7 +44,7 @@ http://127.0.0.1:8000/api
 
 ---
 
-### 1.2 Login (Get JWT Token)
+### 1.2 Login (Dapatkan Token JWT)
 **POST** `/api/login`
 
 **Body (JSON):**
@@ -55,7 +55,7 @@ http://127.0.0.1:8000/api
 }
 ```
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "success": true,
@@ -69,19 +69,19 @@ http://127.0.0.1:8000/api
 }
 ```
 
-**⚠️ IMPORTANT:** Save the `token` value for use in protected endpoints!
+**⚠️ PENTING:** Simpan nilai `token` untuk digunakan di endpoint terproteksi!
 
 ---
 
-### 1.3 Get Current User Profile
+### 1.3 Dapatkan Profil Pengguna Saat Ini
 **GET** `/api/me`
 
 **Headers:**
 ```
-Authorization: Bearer {YOUR_TOKEN_HERE}
+Authorization: Bearer {TOKEN_ANDA_DI_SINI}
 ```
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "success": true,
@@ -97,12 +97,12 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
 
 ---
 
-## 2️⃣ Product Tests (CRUD)
+## 2️⃣ Pengujian Produk (CRUD)
 
-### 2.1 Get All Products
+### 2.1 Dapatkan Semua Produk
 **GET** `/api/produk`
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "success": true,
@@ -115,22 +115,6 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
             "sku": "LPT-001",
             "stok": 50,
             "kategori_id": 1
-        },
-        {
-            "id": 2,
-            "nama": "Smartphone X",
-            "harga": "8000000.00",
-            "sku": "HP-001",
-            "stok": 100,
-            "kategori_id": 1
-        },
-        {
-            "id": 3,
-            "nama": "Kemeja Kantor",
-            "harga": "150000.00",
-            "sku": "BJU-001",
-            "stok": 200,
-            "kategori_id": 2
         }
     ]
 }
@@ -138,32 +122,12 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
 
 ---
 
-### 2.2 Get Single Product
-**GET** `/api/produk/1`
-
-**Expected Response (200):**
-```json
-{
-    "success": true,
-    "data": {
-        "id": 1,
-        "nama": "Laptop Pro",
-        "harga": "15000000.00",
-        "sku": "LPT-001",
-        "stok": 50,
-        "kategori_id": 1
-    }
-}
-```
-
----
-
-### 2.3 Create Product (Protected)
+### 2.3 Buat Produk (Terproteksi)
 **POST** `/api/produk`
 
 **Headers:**
 ```
-Authorization: Bearer {YOUR_TOKEN_HERE}
+Authorization: Bearer {TOKEN_ANDA_DI_SINI}
 Content-Type: application/json
 ```
 
@@ -178,7 +142,7 @@ Content-Type: application/json
 }
 ```
 
-**Expected Response (201):**
+**Respons yang Diharapkan (201):**
 ```json
 {
     "success": true,
@@ -196,68 +160,14 @@ Content-Type: application/json
 
 ---
 
-### 2.4 Update Product (Protected)
-**PUT** `/api/produk/4`
+## 3️⃣ Pengujian Pesanan (Stored Procedure)
 
-**Headers:**
-```
-Authorization: Bearer {YOUR_TOKEN_HERE}
-Content-Type: application/json
-```
-
-**Body (JSON):**
-```json
-{
-    "nama": "Mouse Gaming RGB",
-    "harga": 400000,
-    "stok": 80
-}
-```
-
-**Expected Response (200):**
-```json
-{
-    "success": true,
-    "message": "Produk Berhasil Diperbarui",
-    "data": {
-        "id": 4,
-        "nama": "Mouse Gaming RGB",
-        "harga": "400000.00",
-        "sku": "MSE-001",
-        "stok": 80,
-        "kategori_id": 1
-    }
-}
-```
-
----
-
-### 2.5 Delete Product (Protected)
-**DELETE** `/api/produk/4`
-
-**Headers:**
-```
-Authorization: Bearer {YOUR_TOKEN_HERE}
-```
-
-**Expected Response (200):**
-```json
-{
-    "success": true,
-    "message": "Produk Berhasil Dihapus"
-}
-```
-
----
-
-## 3️⃣ Order Tests (Stored Procedure)
-
-### 3.1 Create Order - Tests Stored Procedure
+### 3.1 Buat Pesanan - Menguji Stored Procedure
 **POST** `/api/pesanan`
 
 **Headers:**
 ```
-Authorization: Bearer {YOUR_TOKEN_HERE}
+Authorization: Bearer {TOKEN_ANDA_DI_SINI}
 Content-Type: application/json
 ```
 
@@ -271,7 +181,7 @@ Content-Type: application/json
 }
 ```
 
-**Expected Response (201):**
+**Respons yang Diharapkan (201):**
 ```json
 {
     "success": true,
@@ -280,24 +190,24 @@ Content-Type: application/json
 }
 ```
 
-**Database Effects:**
-- ✅ Stock reduced (trigger logs this to `log_audit`)
-- ✅ Order created in `pesanan` table
-- ✅ Order item created in `item_pesanan` table
-- ✅ Shipping record created in `pengiriman` table
-- ✅ Transaction committed (ACID)
+**Efek di Database:**
+- ✅ Stok berkurang (trigger mencatat ini ke `log_audit`)
+- ✅ Pesanan dibuat di tabel `pesanan`
+- ✅ Item pesanan dibuat di tabel `item_pesanan`
+- ✅ Record pengiriman dibuat di tabel `pengiriman`
+- ✅ Transaksi di-commit (ACID)
 
 ---
 
-### 3.2 Get User's Orders
+### 3.2 Dapatkan Pesanan Pengguna
 **GET** `/api/pesanan`
 
 **Headers:**
 ```
-Authorization: Bearer {YOUR_TOKEN_HERE}
+Authorization: Bearer {TOKEN_ANDA_DI_SINI}
 ```
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "success": true,
@@ -309,11 +219,8 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
             "status": "menunggu",
             "tanggal_pesanan": "2025-12-26 14:30:56",
             "kurir": "JNE",
-            "nomor_resi": null,
-            "status_pengiriman": "siap_kirim",
             "nama_produk": "Laptop Pro",
-            "jumlah": 2,
-            "harga_satuan": "15000000.00"
+            "jumlah": 2
         }
     ]
 }
@@ -321,63 +228,17 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
 
 ---
 
-### 3.3 Get Single Order Details
-**GET** `/api/pesanan/1`
+## 4️⃣ Pengujian Fitur Advanced
 
-**Headers:**
-```
-Authorization: Bearer {YOUR_TOKEN_HERE}
-```
-
-**Expected Response (200):**
-```json
-{
-    "success": true,
-    "data": {
-        "id": 1,
-        "nomor_pesanan": "ORD-1735223456",
-        "pelanggan_id": 1,
-        "total": "30000000.00",
-        "status": "menunggu",
-        "item_pesanan": [
-            {
-                "pesanan_id": 1,
-                "produk_id": 1,
-                "jumlah": 2,
-                "harga_satuan": "15000000.00",
-                "produk": {
-                    "id": 1,
-                    "nama": "Laptop Pro",
-                    "harga": "15000000.00",
-                    "sku": "LPT-001",
-                    "stok": 48
-                }
-            }
-        ],
-        "pengiriman": {
-            "pesanan_id": 1,
-            "kurir": "JNE",
-            "nomor_resi": null,
-            "alamat_tujuan": "Jl. Sudirman No. 123, Jakarta Pusat",
-            "status_pengiriman": "siap_kirim"
-        }
-    }
-}
-```
-
----
-
-## 4️⃣ Advanced Features Tests
-
-### 4.1 Shipping Monitoring (View)
+### 4.1 Monitoring Pengiriman (View)
 **GET** `/api/monitoring-pengiriman`
 
 **Headers:**
 ```
-Authorization: Bearer {YOUR_TOKEN_HERE}
+Authorization: Bearer {TOKEN_ANDA_DI_SINI}
 ```
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "success": true,
@@ -389,7 +250,6 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
             "total": "30000000.00",
             "status_pesanan": "menunggu",
             "kurir": "JNE",
-            "nomor_resi": null,
             "status_pengiriman": "siap_kirim",
             "nama_produk": "Laptop Pro",
             "jumlah": 2
@@ -398,19 +258,19 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
 }
 ```
 
-**Database Feature:** Uses view `v_monitoring_pengiriman`
+**Fitur Database:** Menggunakan view `v_monitoring_pengiriman`
 
 ---
 
-### 4.2 Audit Logs (Trigger)
+### 4.2 Log Audit (Trigger)
 **GET** `/api/audit-logs`
 
 **Headers:**
 ```
-Authorization: Bearer {YOUR_TOKEN_HERE}
+Authorization: Bearer {TOKEN_ANDA_DI_SINI}
 ```
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "success": true,
@@ -428,16 +288,16 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
 }
 ```
 
-**Database Feature:** Populated by trigger `trg_audit_stok_update`
+**Fitur Database:** Diisi oleh trigger `trg_audit_stok_update`
 
 ---
 
 ## 5️⃣ Health Check
 
-### 5.1 API Health
+### 5.1 Kesehatan API
 **GET** `/api/health`
 
-**Expected Response (200):**
+**Respons yang Diharapkan (200):**
 ```json
 {
     "status": "ok",
@@ -449,64 +309,64 @@ Authorization: Bearer {YOUR_TOKEN_HERE}
 
 ---
 
-## 🧪 Testing Scenarios
+## 🧪 Skenario Pengujian
 
-### Scenario 1: Complete Order Flow
-1. Login → Get token
-2. Get products → Choose product
-3. Create order → Stock reduces, audit logged
-4. Get orders → Verify order created
-5. Check audit logs → Verify stock change logged
+### Skenario 1: Alur Pesanan Lengkap
+1. Login → Dapatkan token
+2. Dapatkan produk → Pilih produk
+3. Buat pesanan → Stok berkurang, audit tercatat
+4. Dapatkan pesanan → Verifikasi pesanan dibuat
+5. Periksa log audit → Verifikasi perubahan stok tercatat
 
-### Scenario 2: Stock Validation
-1. Create order with qty > stock
-2. Expected: Error "Stok Tidak Mencukupi"
-3. Verify: Stock unchanged, no order created
+### Skenario 2: Validasi Stok
+1. Buat pesanan dengan qty > stok
+2. Diharapkan: Error "Stok Tidak Mencukupi"
+3. Verifikasi: Stok tidak berubah, tidak ada pesanan dibuat
 
-### Scenario 3: Transaction Rollback
-1. Create order with invalid data
-2. Expected: Transaction rolled back
-3. Verify: No partial data in database
+### Skenario 3: Rollback Transaksi
+1. Buat pesanan dengan data invalid
+2. Diharapkan: Transaksi di-rollback
+3. Verifikasi: Tidak ada data parsial di database
 
 ---
 
-## 📊 Database Queries to Verify
+## 📊 Query Database untuk Verifikasi
 
-After creating orders, verify in database:
+Setelah membuat pesanan, verifikasi di database:
 
 ```sql
--- Check stock reduced
+-- Periksa stok berkurang
 SELECT id, nama, stok FROM produk WHERE id = 1;
 
--- Check order created
+-- Periksa pesanan dibuat
 SELECT * FROM pesanan ORDER BY id DESC LIMIT 1;
 
--- Check order items
+-- Periksa item pesanan
 SELECT * FROM item_pesanan ORDER BY id DESC LIMIT 1;
 
--- Check shipping created
+-- Periksa pengiriman dibuat
 SELECT * FROM pengiriman ORDER BY id DESC LIMIT 1;
 
--- Check audit log
+-- Periksa log audit
 SELECT * FROM log_audit ORDER BY id DESC LIMIT 5;
 
--- Test function
+-- Uji function
 SELECT hitung_total_pesanan(1) as total;
 
--- Test view
+-- Uji view
 SELECT * FROM v_monitoring_pengiriman;
 ```
 
 ---
 
-## ✅ Success Criteria
+## ✅ Kriteria Keberhasilan
 
-All tests should pass with:
-- ✅ Proper HTTP status codes
-- ✅ Correct JSON response format
-- ✅ Data persisted in database
-- ✅ Stored procedure executes successfully
-- ✅ Trigger logs audit entries
-- ✅ Function calculates correctly
-- ✅ View returns joined data
-- ✅ Transactions maintain ACID properties
+Semua pengujian harus lulus dengan:
+- ✅ Kode status HTTP yang benar
+- ✅ Format respons JSON yang benar
+- ✅ Data tersimpan di database
+- ✅ Stored procedure berhasil dieksekusi
+- ✅ Trigger mencatat entri audit
+- ✅ Function menghitung dengan benar
+- ✅ View mengembalikan data yang di-join
+- ✅ Transaksi mempertahankan properti ACID

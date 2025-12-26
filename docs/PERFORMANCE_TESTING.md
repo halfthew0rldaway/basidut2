@@ -1,78 +1,78 @@
-# Performance Testing & Optimization Guide
+# Panduan Pengujian Performa & Optimasi
 
-## 🚀 Seeding Large Dataset
+## 🚀 Seeding Dataset Besar
 
-### Step 1: Seed 1000+ Rows for Performance Testing
+### Langkah 1: Seed 1000+ Baris untuk Pengujian Performa
 
 ```bash
-# Seed data besar (1000 products + 500 orders)
+# Seed data besar (1000 produk + 500 pesanan)
 php artisan db:seed --class=PerformanceTestSeeder
 ```
 
 **Data yang akan dibuat:**
-- ✅ 1000 products tambahan (total: 1003 products)
-- ✅ 500 orders
-- ✅ 1500+ order items
-- ✅ 500 shipping records
+- ✅ 1000 produk tambahan (total: 1003 produk)
+- ✅ 500 pesanan
+- ✅ 1500+ item pesanan
+- ✅ 500 catatan pengiriman
 
-**Total rows: 3000+ records**
+**Total baris: 3000+ record**
 
-### Step 2: Verify Data Count
+### Langkah 2: Verifikasi Jumlah Data
 
 ```bash
 php artisan tinker
 ```
 
 ```php
-// Check counts
-DB::table('produk')->count();      // Should be 1003
-DB::table('pesanan')->count();     // Should be 500+
-DB::table('item_pesanan')->count(); // Should be 1500+
-DB::table('pengiriman')->count();  // Should be 500+
+// Periksa jumlah
+DB::table('produk')->count();      // Seharusnya 1003
+DB::table('pesanan')->count();     // Seharusnya 500+
+DB::table('item_pesanan')->count(); // Seharusnya 1500+
+DB::table('pengiriman')->count();  // Seharusnya 500+
 ```
 
-## 📊 Query Optimization Testing
+## 📊 Pengujian Optimasi Query
 
-### 1. Test Query Performance - Before Optimization
+### 1. Uji Performa Query - Sebelum Optimasi
 
 ```sql
--- Query tanpa index (slow)
+-- Query tanpa index (lambat)
 EXPLAIN SELECT * FROM pesanan 
 WHERE pelanggan_id = 1 
 ORDER BY tanggal_pesanan DESC;
 
--- Check execution time
+-- Periksa waktu eksekusi
 SET profiling = 1;
 SELECT * FROM pesanan WHERE pelanggan_id = 1;
 SHOW PROFILES;
 ```
 
-### 2. Add Indexes for Optimization
+### 2. Tambahkan Index untuk Optimasi
 
 ```sql
--- Add index on frequently queried columns
+-- Tambahkan index pada kolom yang sering di-query
 CREATE INDEX idx_pesanan_tanggal ON pesanan(tanggal_pesanan);
 CREATE INDEX idx_item_pesanan_produk ON item_pesanan(produk_id);
 CREATE INDEX idx_pengiriman_status ON pengiriman(status_pengiriman);
 ```
 
-### 3. Test Query Performance - After Optimization
+### 3. Uji Performa Query - Setelah Optimasi
 
 ```sql
--- Query dengan index (fast)
+-- Query dengan index (cepat)
 EXPLAIN SELECT * FROM pesanan 
 WHERE pelanggan_id = 1 
 ORDER BY tanggal_pesanan DESC;
 
--- Compare execution time
+-- Bandingkan waktu eksekusi
 SELECT * FROM pesanan WHERE pelanggan_id = 1;
 SHOW PROFILES;
 ```
 
-### 4. Complex JOIN Query Testing
+### 4. Pengujian Query JOIN Kompleks
 
 ```sql
--- Test complex JOIN with large dataset
+-- Uji JOIN kompleks dengan dataset besar
 EXPLAIN SELECT 
     p.nomor_pesanan,
     pg.nama_lengkap,
@@ -88,12 +88,12 @@ WHERE p.status = 'selesai'
 LIMIT 100;
 ```
 
-## 🔍 Performance Analysis
+## 🔍 Analisis Performa
 
-### Using EXPLAIN ANALYZE
+### Menggunakan EXPLAIN ANALYZE
 
 ```sql
--- Analyze query execution plan
+-- Analisis rencana eksekusi query
 EXPLAIN ANALYZE
 SELECT p.*, COUNT(ip.id) as total_items
 FROM pesanan p
@@ -102,155 +102,155 @@ GROUP BY p.id
 HAVING total_items > 1;
 ```
 
-**Metrics to check:**
-- **rows**: Number of rows scanned
-- **filtered**: Percentage of rows filtered
-- **type**: Join type (ALL = bad, ref/eq_ref = good)
-- **key**: Index used (NULL = no index)
+**Metrik yang perlu diperiksa:**
+- **rows**: Jumlah baris yang dipindai
+- **filtered**: Persentase baris yang difilter
+- **type**: Tipe join (ALL = buruk, ref/eq_ref = baik)
+- **key**: Index yang digunakan (NULL = tidak ada index)
 
 ### Slow Query Log
 
-Enable slow query logging:
+Aktifkan logging query lambat:
 ```sql
 SET GLOBAL slow_query_log = 'ON';
-SET GLOBAL long_query_time = 1; -- Queries slower than 1 second
+SET GLOBAL long_query_time = 1; -- Query lebih lambat dari 1 detik
 SET GLOBAL slow_query_log_file = 'C:/mysql/slow-query.log';
 ```
 
-## 📈 Performance Benchmarks
+## 📈 Benchmark Performa
 
-### Benchmark Results (Example)
+### Hasil Benchmark (Contoh)
 
-| Query Type | Before Index | After Index | Improvement |
-|------------|--------------|-------------|-------------|
-| Simple SELECT | 0.15s | 0.02s | 87% faster |
-| JOIN Query | 0.45s | 0.08s | 82% faster |
-| Aggregate Query | 0.30s | 0.05s | 83% faster |
-| View Query | 0.25s | 0.06s | 76% faster |
+| Jenis Query | Sebelum Index | Setelah Index | Peningkatan |
+|-------------|---------------|---------------|-------------|
+| SELECT Sederhana | 0.15s | 0.02s | 87% lebih cepat |
+| Query JOIN | 0.45s | 0.08s | 82% lebih cepat |
+| Query Agregat | 0.30s | 0.05s | 83% lebih cepat |
+| Query View | 0.25s | 0.06s | 76% lebih cepat |
 
-### API Endpoint Performance
+### Performa Endpoint API
 
-Test dengan Postman:
+Uji dengan Postman:
 ```
-GET /api/pesanan (500 orders)
-- Without index: ~450ms
-- With index: ~80ms
-- Improvement: 82%
+GET /api/pesanan (500 pesanan)
+- Tanpa index: ~450ms
+- Dengan index: ~80ms
+- Peningkatan: 82%
 ```
 
-## 🎯 Optimization Strategies Implemented
+## 🎯 Strategi Optimasi yang Diimplementasikan
 
-### 1. Database Level
+### 1. Level Database
 
-✅ **Indexes** on:
-- `pengguna.email` (login queries)
-- `pesanan.pelanggan_id` (user orders)
-- `produk.kategori_id` (category filtering)
-- `pengiriman.nomor_resi` (tracking)
+✅ **Index** pada:
+- `pengguna.email` (query login)
+- `pesanan.pelanggan_id` (pesanan pengguna)
+- `produk.kategori_id` (filtering kategori)
+- `pengiriman.nomor_resi` (pelacakan)
 
-✅ **Foreign Keys** for:
-- Query optimization
-- Data integrity
+✅ **Foreign Keys** untuk:
+- Optimasi query
+- Integritas data
 
-✅ **Views** for:
-- Complex JOIN queries
-- Frequently accessed data
+✅ **Views** untuk:
+- Query JOIN kompleks
+- Data yang sering diakses
 
-### 2. Application Level
+### 2. Level Aplikasi
 
 ✅ **Eager Loading**:
 ```php
-// Bad (N+1 problem)
+// Buruk (masalah N+1)
 $orders = Pesanan::all();
 foreach ($orders as $order) {
-    echo $order->pengiriman->kurir; // N queries
+    echo $order->pengiriman->kurir; // N query
 }
 
-// Good (1 query)
+// Baik (1 query)
 $orders = Pesanan::with('pengiriman')->get();
 ```
 
 ✅ **Query Caching**:
 ```php
-// Cache expensive queries
+// Cache query yang mahal
 Cache::remember('products', 3600, function () {
     return Produk::all();
 });
 ```
 
-### 3. Stored Procedure Optimization
+### 3. Optimasi Stored Procedure
 
-✅ **Row Locking** for concurrency:
+✅ **Row Locking** untuk konkurensi:
 ```sql
-SELECT ... FOR UPDATE; -- Prevents race conditions
+SELECT ... FOR UPDATE; -- Mencegah race condition
 ```
 
 ✅ **Transaction Batching**:
 ```sql
 START TRANSACTION;
--- Multiple operations
+-- Beberapa operasi
 COMMIT;
 ```
 
-## 📝 Testing Checklist
+## 📝 Daftar Periksa Pengujian
 
-### Before Performance Test
+### Sebelum Pengujian Performa
 - [ ] Backup database
-- [ ] Note current data counts
-- [ ] Record baseline query times
+- [ ] Catat jumlah data saat ini
+- [ ] Rekam waktu query baseline
 
-### During Performance Test
-- [ ] Seed 1000+ rows
-- [ ] Run EXPLAIN on critical queries
-- [ ] Enable slow query log
-- [ ] Test API endpoints with large dataset
+### Selama Pengujian Performa
+- [ ] Seed 1000+ baris
+- [ ] Jalankan EXPLAIN pada query kritis
+- [ ] Aktifkan slow query log
+- [ ] Uji endpoint API dengan dataset besar
 
-### After Performance Test
-- [ ] Compare query execution times
-- [ ] Document improvements
-- [ ] Add necessary indexes
-- [ ] Update documentation
+### Setelah Pengujian Performa
+- [ ] Bandingkan waktu eksekusi query
+- [ ] Dokumentasikan peningkatan
+- [ ] Tambahkan index yang diperlukan
+- [ ] Perbarui dokumentasi
 
-## 🔧 Commands for TB Demonstration
+## 🔧 Perintah untuk Demonstrasi TB
 
-### 1. Seed Large Dataset
+### 1. Seed Dataset Besar
 ```bash
 php artisan db:seed --class=PerformanceTestSeeder
 ```
 
-### 2. Show Data Counts
+### 2. Tampilkan Jumlah Data
 ```sql
 SELECT 
-    (SELECT COUNT(*) FROM produk) as total_products,
-    (SELECT COUNT(*) FROM pesanan) as total_orders,
-    (SELECT COUNT(*) FROM item_pesanan) as total_items,
-    (SELECT COUNT(*) FROM pengiriman) as total_shipments;
+    (SELECT COUNT(*) FROM produk) as total_produk,
+    (SELECT COUNT(*) FROM pesanan) as total_pesanan,
+    (SELECT COUNT(*) FROM item_pesanan) as total_item,
+    (SELECT COUNT(*) FROM pengiriman) as total_pengiriman;
 ```
 
-### 3. Show Query Performance
+### 3. Tampilkan Performa Query
 ```sql
--- Before optimization
+-- Sebelum optimasi
 EXPLAIN SELECT * FROM pesanan WHERE pelanggan_id = 1;
 
--- After adding index
+-- Setelah menambahkan index
 CREATE INDEX idx_test ON pesanan(pelanggan_id);
 EXPLAIN SELECT * FROM pesanan WHERE pelanggan_id = 1;
 ```
 
-### 4. Show Index Usage
+### 4. Tampilkan Penggunaan Index
 ```sql
 SHOW INDEX FROM pesanan;
 SHOW INDEX FROM produk;
 ```
 
-## 📊 Expected Results for TB
+## 📊 Hasil yang Diharapkan untuk TB
 
-After running PerformanceTestSeeder:
-- ✅ 1003 products
-- ✅ 500+ orders
-- ✅ 1500+ order items
-- ✅ Measurable performance improvement with indexes
-- ✅ Query optimization demonstrated
-- ✅ Backup strategy documented
+Setelah menjalankan PerformanceTestSeeder:
+- ✅ 1003 produk
+- ✅ 500+ pesanan
+- ✅ 1500+ item pesanan
+- ✅ Peningkatan performa terukur dengan index
+- ✅ Optimasi query terdemonstrasi
+- ✅ Strategi backup terdokumentasi
 
-This meets the requirement: **"Data banyakin mas 1000 row minimal supaya cek optimasi/performa query"** ✅
+Ini memenuhi requirement: **"Data banyakin mas 1000 row minimal supaya cek optimasi/performa query"** ✅

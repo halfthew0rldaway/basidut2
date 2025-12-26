@@ -1,121 +1,121 @@
-# Basidut API - Complete Testing Package
+# Paket Pengujian Basidut API - README Lengkap
 
-## 📦 Files Created
+## 📦 File yang Dibuat
 
 ### Postman Collection
 **File**: `docs/Basidut_API_Collection.postman_collection.json`
 
-Import this into Postman to get all test requests ready to use!
+Impor file ini ke Postman untuk mendapatkan semua request pengujian siap pakai!
 
-### Documentation
-1. **POSTMAN_IMPORT_GUIDE.md** - How to import and use the collection
-2. **API_TESTING_GUIDE.md** - Detailed testing scenarios
-3. **API_DOCUMENTATION.md** - Complete API reference
-4. **MIGRATION_GUIDE.md** - Database setup instructions
+### Dokumentasi
+1. **POSTMAN_IMPORT_GUIDE.md** - Cara impor dan menggunakan collection
+2. **API_TESTING_GUIDE.md** - Skenario pengujian detail
+3. **API_DOCUMENTATION.md** - Referensi API lengkap
+4. **MIGRATION_GUIDE.md** - Instruksi setup database
 
-## 🚀 Quick Start
+## 🚀 Memulai dengan Cepat
 
-### 1. Import to Postman
+### 1. Impor ke Postman
 ```
-File → Import → Upload Files → Select Basidut_API_Collection.postman_collection.json
+File → Import → Upload Files → Pilih Basidut_API_Collection.postman_collection.json
 ```
 
-### 2. Run Tests in Order
+### 2. Jalankan Pengujian Sesuai Urutan
 
-The collection includes **15 requests** organized in 5 folders:
+Collection mencakup **15 request** yang diorganisir dalam 5 folder:
 
-#### 1️⃣ Authentication (4 requests)
-- Register New User
-- **Login - Get JWT Token** (auto-saves token!)
-- Get Current User Profile
+#### 1️⃣ Autentikasi (4 request)
+- Register Pengguna Baru
+- **Login - Dapatkan Token JWT** (menyimpan token otomatis!)
+- Dapatkan Profil Pengguna Saat Ini
 - Logout
 
-#### 2️⃣ Products - CRUD (5 requests)
-- Get All Products
-- Get Single Product
-- Create Product (tests constraints)
-- Update Product
-- Delete Product
+#### 2️⃣ Produk - CRUD (5 request)
+- Dapatkan Semua Produk
+- Dapatkan Produk Tunggal
+- Buat Produk (menguji constraints)
+- Perbarui Produk
+- Hapus Produk
 
-#### 3️⃣ Orders - Stored Procedure (4 requests)
-- **Create Order** - Tests stored procedure with ACID transaction
-- Create Order - Test stock validation (should fail)
-- Get User's Orders (JOIN query)
-- Get Single Order Details
+#### 3️⃣ Pesanan - Stored Procedure (4 request)
+- **Buat Pesanan** - Menguji stored procedure dengan transaksi ACID
+- Buat Pesanan - Uji validasi stok (seharusnya gagal)
+- Dapatkan Pesanan Pengguna (query JOIN)
+- Dapatkan Detail Pesanan Tunggal
 
-#### 4️⃣ Advanced Features (2 requests)
-- **Shipping Monitoring** - Tests database VIEW
-- **Audit Logs** - Tests database TRIGGER
+#### 4️⃣ Fitur Advanced (2 request)
+- **Monitoring Pengiriman** - Menguji database VIEW
+- **Log Audit** - Menguji database TRIGGER
 
 #### 5️⃣ Health Check (1 request)
-- API Health Check
+- Pemeriksaan Kesehatan API
 
-## ✅ What Gets Tested
+## ✅ Yang Diuji
 
-### Database Features (TB Requirements)
+### Fitur Database (Requirement TB)
 - ✅ **Stored Procedure**: `sp_buat_pesanan_enterprise`
 - ✅ **Trigger**: `trg_audit_stok_update`
-- ✅ **Function**: `hitung_total_pesanan` (used internally)
+- ✅ **Function**: `hitung_total_pesanan` (digunakan secara internal)
 - ✅ **View**: `v_monitoring_pengiriman`
 - ✅ **Transaction**: BEGIN/COMMIT/ROLLBACK
-- ✅ **JOIN Queries**: Multi-table joins
+- ✅ **Query JOIN**: Multi-table joins
 - ✅ **Constraints**: CHECK, FOREIGN KEY, UNIQUE
-- ✅ **Indexes**: Performance optimization
+- ✅ **Indexes**: Optimasi performa
 
-### API Features
-- ✅ JWT Authentication
-- ✅ CRUD Operations (3 modules: Produk, Pesanan, Pengguna)
-- ✅ Protected Endpoints
-- ✅ Request Validation
-- ✅ Error Handling
+### Fitur API
+- ✅ Autentikasi JWT
+- ✅ Operasi CRUD (3 modul: Produk, Pesanan, Pengguna)
+- ✅ Endpoint Terproteksi
+- ✅ Validasi Request
+- ✅ Penanganan Error
 
-## 📋 Testing Checklist
+## 📋 Daftar Periksa Pengujian
 
-Before testing:
-- [ ] Run `php artisan migrate:fresh --seed`
-- [ ] Start server: `php artisan serve`
-- [ ] Import Postman collection
+Sebelum pengujian:
+- [ ] Jalankan `php artisan migrate:fresh --seed`
+- [ ] Jalankan server: `php artisan serve`
+- [ ] Impor Postman collection
 
-Test sequence:
-1. [ ] Login (saves token automatically)
-2. [ ] Get products
-3. [ ] Create product
-4. [ ] Create order (tests stored procedure)
-5. [ ] Check audit logs (tests trigger)
-6. [ ] Check shipping monitoring (tests view)
+Urutan pengujian:
+1. [ ] Login (menyimpan token otomatis)
+2. [ ] Dapatkan produk
+3. [ ] Buat produk
+4. [ ] Buat pesanan (menguji stored procedure)
+5. [ ] Periksa log audit (menguji trigger)
+6. [ ] Periksa monitoring pengiriman (menguji view)
 
-## 🎯 Key Tests for TB
+## 🎯 Pengujian Kunci untuk TB
 
-### Test 1: Stored Procedure + Transaction
+### Pengujian 1: Stored Procedure + Transaction
 **Request**: `3.1 Create Order - Test Stored Procedure`
 
-Tests:
-- ACID transaction (BEGIN/COMMIT)
+Menguji:
+- Transaksi ACID (BEGIN/COMMIT)
 - Row locking (FOR UPDATE)
 - Multi-table insert
-- Stock validation
-- Error handling with ROLLBACK
+- Validasi stok
+- Penanganan error dengan ROLLBACK
 
-### Test 2: Trigger
+### Pengujian 2: Trigger
 **Request**: `4.2 Audit Logs (Trigger)`
 
-After creating order, this shows:
-- Automatic audit logging
-- Stock change tracking
-- Trigger execution proof
+Setelah membuat pesanan, ini menampilkan:
+- Logging audit otomatis
+- Pelacakan perubahan stok
+- Bukti eksekusi trigger
 
-### Test 3: View
+### Pengujian 3: View
 **Request**: `4.1 Shipping Monitoring (View)`
 
-Shows:
-- Database view usage
+Menampilkan:
+- Penggunaan database view
 - Multi-table JOIN
-- Real-time data aggregation
+- Agregasi data real-time
 
-### Test 4: JOIN Queries
+### Pengujian 4: Query JOIN
 **Request**: `3.3 Get User's Orders`
 
-Uses complex JOIN:
+Menggunakan JOIN kompleks:
 ```sql
 pesanan 
   LEFT JOIN pengiriman
@@ -123,56 +123,56 @@ pesanan
   LEFT JOIN produk
 ```
 
-## 📊 Expected Results
+## 📊 Hasil yang Diharapkan
 
-After running all tests:
+Setelah menjalankan semua pengujian:
 
-**Database Changes:**
-- New product created (ID: 4)
-- New order created
-- Stock reduced (e.g., Laptop Pro: 50 → 48)
-- Audit log entries (2-3 entries)
+**Perubahan Database:**
+- Produk baru dibuat (ID: 4)
+- Pesanan baru dibuat
+- Stok berkurang (mis., Laptop Pro: 50 → 48)
+- Entri log audit (2-3 entri)
 
-**API Responses:**
-- All requests return proper JSON
-- JWT token auto-saved
-- Protected endpoints work with token
-- Validation errors handled properly
+**Respons API:**
+- Semua request mengembalikan JSON yang benar
+- Token JWT tersimpan otomatis
+- Endpoint terproteksi berfungsi dengan token
+- Error validasi ditangani dengan baik
 
-## 🔍 Verify in Database
+## 🔍 Verifikasi di Database
 
 ```sql
--- Check order created
+-- Periksa pesanan dibuat
 SELECT * FROM pesanan ORDER BY id DESC LIMIT 1;
 
--- Check stock reduced
+-- Periksa stok berkurang
 SELECT nama, stok FROM produk WHERE id = 1;
 
--- Check audit log (trigger proof)
+-- Periksa log audit (bukti trigger)
 SELECT * FROM log_audit ORDER BY id DESC;
 
--- Test view
+-- Uji view
 SELECT * FROM v_monitoring_pengiriman;
 
--- Test function
+-- Uji function
 SELECT hitung_total_pesanan(1);
 ```
 
-## 📝 Notes
+## 📝 Catatan
 
-- **Auto Token Save**: Login request automatically saves JWT token
-- **Test Order**: Run requests in sequence for best results
-- **Stock Tracking**: Each order reduces stock
-- **Audit Logs**: Trigger creates entries automatically
+- **Penyimpanan Token Otomatis**: Request login secara otomatis menyimpan token JWT
+- **Urutan Pengujian**: Jalankan request secara berurutan untuk hasil terbaik
+- **Pelacakan Stok**: Setiap pesanan mengurangi stok
+- **Log Audit**: Trigger membuat entri secara otomatis
 
-## 🎓 For TB Presentation
+## 🎓 Untuk Presentasi TB
 
-You can demonstrate:
-1. **Stored Procedure** - Show order creation in Postman
-2. **Trigger** - Show audit logs populated automatically
-3. **View** - Show shipping monitoring data
-4. **Function** - Run in database: `SELECT hitung_total_pesanan(1)`
-5. **Transaction** - Show rollback on stock validation failure
-6. **JOIN** - Show complex query results in orders endpoint
+Anda dapat mendemonstrasikan:
+1. **Stored Procedure** - Tampilkan pembuatan pesanan di Postman
+2. **Trigger** - Tampilkan log audit terisi otomatis
+3. **View** - Tampilkan data monitoring pengiriman
+4. **Function** - Jalankan di database: `SELECT hitung_total_pesanan(1)`
+5. **Transaction** - Tampilkan rollback pada kegagalan validasi stok
+6. **JOIN** - Tampilkan hasil query kompleks di endpoint pesanan
 
-All advanced database features are working and testable via API! 🚀
+Semua fitur advanced database berfungsi dan dapat diuji via API! 🚀

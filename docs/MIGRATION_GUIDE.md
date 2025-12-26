@@ -1,120 +1,120 @@
-# Migration Guide - Basidut Database
+# Panduan Migrasi Database - Basidut
 
-## 🚀 Quick Start
+## 🚀 Memulai dengan Cepat
 
-### Step 1: Delete Old Database (if exists)
+### Langkah 1: Hapus Database Lama (jika ada)
 ```sql
 DROP DATABASE IF EXISTS basidut;
 CREATE DATABASE basidut CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Or in HeidiSQL:
-- Right-click on `basidut` database → Drop
-- Create new database named `basidut`
+Atau menggunakan HeidiSQL:
+- Klik kanan pada database `basidut` → Drop
+- Buat database baru dengan nama `basidut`
 
-### Step 2: Update .env File
-Make sure your `.env` has correct database settings:
+### Langkah 2: Perbarui File .env
+Pastikan file `.env` memiliki pengaturan database yang benar:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=basidut
 DB_USERNAME=root
-DB_PASSWORD=your_mysql_password
+DB_PASSWORD=password_mysql_anda
 
-JWT_SECRET=your_jwt_secret_here
+JWT_SECRET=kunci_jwt_anda_di_sini
 ```
 
-### Step 3: Run Fresh Migration with Seeding
+### Langkah 3: Jalankan Migrasi Fresh dengan Seeding
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-This single command will:
-- Drop all existing tables
-- Run all migrations (create tables, stored procedure, trigger, function, view)
-- Seed the database with test data
+Satu perintah ini akan:
+- Menghapus semua tabel yang ada
+- Menjalankan semua migrasi (membuat tabel, stored procedure, trigger, function, view)
+- Melakukan seeding database dengan data pengujian
 
-### Step 4: Verify Setup
+### Langkah 4: Verifikasi Pengaturan
 ```bash
 php artisan tinker
 ```
 
-Then run these checks:
+Kemudian jalankan pemeriksaan berikut:
 ```php
-// Check user count (should be 101)
+// Periksa jumlah pengguna (seharusnya 101)
 App\Models\Pengguna::count();
 
-// Check password is bcrypt hashed
-App\Models\Pengguna::first()->kata_sandi; // Should start with $2y$
+// Periksa password di-hash dengan bcrypt
+App\Models\Pengguna::first()->kata_sandi; // Seharusnya dimulai dengan $2y$
 
-// Check products
-App\Models\Produk::count(); // Should be 3
+// Periksa produk
+App\Models\Produk::count(); // Seharusnya 3
 
-// Check stored procedure exists
+// Periksa stored procedure ada
 DB::select("SHOW PROCEDURE STATUS WHERE Db = 'basidut'");
 
-// Check trigger exists
+// Periksa trigger ada
 DB::select("SHOW TRIGGERS WHERE `Table` = 'produk'");
 
-// Check view exists
+// Periksa view ada
 DB::select("SHOW FULL TABLES WHERE Table_Type = 'VIEW'");
 ```
 
-## 📋 What Gets Created
+## 📋 Yang Akan Dibuat
 
-### Tables (8)
-1. **kategori** - Product categories
-2. **pengguna** - Users with bcrypt passwords
-3. **produk** - Products with foreign key to kategori
-4. **pesanan** - Orders with foreign key to pengguna
-5. **item_pesanan** - Order items (many-to-many)
-6. **pengiriman** - Shipping information
-7. **log_audit** - Audit logs
-8. **metode_pembayaran** - Payment methods
+### Tabel (8)
+1. **kategori** - Kategori produk
+2. **pengguna** - Pengguna dengan password bcrypt
+3. **produk** - Produk dengan foreign key ke kategori
+4. **pesanan** - Pesanan dengan foreign key ke pengguna
+5. **item_pesanan** - Item pesanan (relasi many-to-many)
+6. **pengiriman** - Informasi pengiriman
+7. **log_audit** - Log audit
+8. **metode_pembayaran** - Metode pembayaran
 
-### Advanced Features (4)
-1. **Stored Procedure**: `sp_buat_pesanan_enterprise` - Creates orders with ACID transaction
-2. **Trigger**: `trg_audit_stok_update` - Auto-logs stock changes
-3. **Function**: `hitung_total_pesanan` - Calculates order total
-4. **View**: `v_monitoring_pengiriman` - Shipping monitoring
+### Fitur Advanced (4)
+1. **Stored Procedure**: `sp_buat_pesanan_enterprise` - Membuat pesanan dengan transaksi ACID
+2. **Trigger**: `trg_audit_stok_update` - Mencatat perubahan stok secara otomatis
+3. **Function**: `hitung_total_pesanan` - Menghitung total pesanan
+4. **View**: `v_monitoring_pengiriman` - Monitoring pengiriman
 
-### Seeded Data
-- **101 users** (user1-user100 + admin) - Password: `password123` (bcrypt hashed)
-- **3 categories** (Elektronik, Fashion, Rumah Tangga)
-- **3 products** (Laptop Pro, Smartphone X, Kemeja Kantor)
-- **2 payment methods** (Transfer Bank, Kartu Kredit)
+### Data Seeding
+- **101 pengguna** (user1-user100 + admin) - Password: `password123` (di-hash dengan bcrypt)
+- **3 kategori** (Elektronik, Fashion, Rumah Tangga)
+- **3 produk** (Laptop Pro, Smartphone X, Kemeja Kantor)
+- **2 metode pembayaran** (Transfer Bank, Kartu Kredit)
 
-## 🧪 Testing the Setup
+## 🧪 Menguji Pengaturan
 
-### Test 1: Login API
+### Pengujian 1: Login API
 ```bash
 curl -X POST http://127.0.0.1:8000/api/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user1@mail.com","kata_sandi":"password123"}'
 ```
 
-Expected: JWT token returned
+Hasil yang diharapkan: Token JWT dikembalikan
 
-### Test 2: Get Products
+### Pengujian 2: Ambil Produk
 ```bash
 curl http://127.0.0.1:8000/api/produk
 ```
 
-Expected: 3 products returned
+Hasil yang diharapkan: 3 produk dikembalikan
 
-### Test 3: Create Order (Tests Stored Procedure)
-First login to get token, then:
+### Pengujian 3: Buat Pesanan (Menguji Stored Procedure)
+Login terlebih dahulu untuk mendapatkan token, kemudian:
 ```bash
 curl -X POST http://127.0.0.1:8000/api/pesanan \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer TOKEN_ANDA" \
   -H "Content-Type: application/json" \
-  -d '{"product_id":1,"qty":1,"courier":"JNE","address":"Test Address"}'
+  -d '{"product_id":1,"qty":1,"courier":"JNE","address":"Alamat Pengujian"}'
 ```
 
-Expected: Order created successfully
+Hasil yang diharapkan: Pesanan berhasil dibuat
 
-### Test 4: Check Audit Log (Tests Trigger)
+### Pengujian 4: Periksa Log Audit (Menguji Trigger)
 ```bash
 php artisan tinker
 ```
@@ -122,9 +122,9 @@ php artisan tinker
 DB::table('log_audit')->get();
 ```
 
-Expected: Audit entry for stock change
+Hasil yang diharapkan: Entri audit untuk perubahan stok
 
-### Test 5: Test Function
+### Pengujian 5: Uji Function
 ```bash
 php artisan tinker
 ```
@@ -132,7 +132,7 @@ php artisan tinker
 DB::select("SELECT hitung_total_pesanan(1) as total");
 ```
 
-### Test 6: Test View
+### Pengujian 6: Uji View
 ```bash
 php artisan tinker
 ```
@@ -140,62 +140,62 @@ php artisan tinker
 DB::table('v_monitoring_pengiriman')->get();
 ```
 
-## 🔄 Common Commands
+## 🔄 Perintah Umum
 
-### Fresh Migration (Drops Everything)
+### Migrasi Fresh (Menghapus Semua)
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-### Rollback Last Migration
+### Rollback Migrasi Terakhir
 ```bash
 php artisan migrate:rollback
 ```
 
-### Check Migration Status
+### Periksa Status Migrasi
 ```bash
 php artisan migrate:status
 ```
 
-### Run Seeders Only
+### Jalankan Seeder Saja
 ```bash
 php artisan db:seed
 ```
 
-### Run Specific Seeder
+### Jalankan Seeder Tertentu
 ```bash
 php artisan db:seed --class=PenggunaSeeder
 ```
 
-## 🔑 Test Credentials
+## 🔑 Kredensial Pengujian
 
-**Regular Users:**
-- Email: `user1@mail.com` to `user100@mail.com`
+**Pengguna Reguler:**
+- Email: `user1@mail.com` sampai `user100@mail.com`
 - Password: `password123`
 
 **Admin:**
 - Email: `basidut@jokowi.com`
 - Password: `password123`
 
-## ⚠️ Troubleshooting
+## ⚠️ Pemecahan Masalah
 
 ### Error: "Access denied for user"
-- Check `.env` DB_USERNAME and DB_PASSWORD
-- Make sure MySQL is running
+- Periksa DB_USERNAME dan DB_PASSWORD di `.env`
+- Pastikan MySQL sedang berjalan
 
 ### Error: "Database doesn't exist"
-- Create database manually: `CREATE DATABASE basidut;`
+- Buat database secara manual: `CREATE DATABASE basidut;`
 
 ### Error: "Syntax error in migration"
-- Make sure MySQL version is 8.0+
-- Check that all migrations are in correct order
+- Pastikan versi MySQL adalah 8.0+
+- Periksa bahwa semua migrasi dalam urutan yang benar
 
-### Passwords not working
-- Make sure seeders ran successfully
-- Check password is bcrypt: `App\Models\Pengguna::first()->kata_sandi`
-- Should start with `$2y$`
+### Password tidak berfungsi
+- Pastikan seeder berhasil dijalankan
+- Periksa password di-hash dengan bcrypt: `App\Models\Pengguna::first()->kata_sandi`
+- Seharusnya dimulai dengan `$2y$`
 
-## 📊 Database Schema Overview
+## 📊 Gambaran Skema Database
 
 ```
 kategori (1) ──< produk (N)
@@ -209,16 +209,16 @@ pengguna (1) ──< pesanan (N) ──< item_pesanan (N)
               pengiriman (1)
 ```
 
-## ✅ Success Checklist
+## ✅ Daftar Periksa Keberhasilan
 
-After running migrations, verify:
-- [ ] All 8 tables created
-- [ ] Stored procedure `sp_buat_pesanan_enterprise` exists
-- [ ] Trigger `trg_audit_stok_update` exists
-- [ ] Function `hitung_total_pesanan` exists
-- [ ] View `v_monitoring_pengiriman` exists
-- [ ] 101 users seeded with bcrypt passwords
-- [ ] 3 products seeded
-- [ ] API login works
-- [ ] Can create orders via API
-- [ ] Audit log records stock changes
+Setelah menjalankan migrasi, verifikasi:
+- [ ] Semua 8 tabel dibuat
+- [ ] Stored procedure `sp_buat_pesanan_enterprise` ada
+- [ ] Trigger `trg_audit_stok_update` ada
+- [ ] Function `hitung_total_pesanan` ada
+- [ ] View `v_monitoring_pengiriman` ada
+- [ ] 101 pengguna di-seed dengan password bcrypt
+- [ ] 3 produk di-seed
+- [ ] API login berfungsi
+- [ ] Dapat membuat pesanan via API
+- [ ] Log audit mencatat perubahan stok

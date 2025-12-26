@@ -1,66 +1,113 @@
-# Basidut API - Quick Reference
+# Referensi Cepat API Basidut
 
-## 🚀 API Endpoints Summary
-
-### Public Endpoints (No Auth)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/register` | Register new user |
-| POST | `/api/login` | Login and get JWT token |
-| GET | `/api/produk` | Get all products |
-| GET | `/api/produk/{id}` | Get single product |
-| GET | `/api/health` | Health check |
-
-### Protected Endpoints (Requires JWT)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/me` | Get current user profile |
-| POST | `/api/logout` | Logout |
-| POST | `/api/produk` | Create product |
-| PUT | `/api/produk/{id}` | Update product |
-| DELETE | `/api/produk/{id}` | Delete product |
-| GET | `/api/pesanan` | Get user's orders |
-| GET | `/api/pesanan/{id}` | Get order details |
-| POST | `/api/pesanan` | Create order (stored procedure) |
-| GET | `/api/monitoring-pengiriman` | Get shipping monitoring |
-| GET | `/api/audit-logs` | Get audit logs |
-
-## 📝 Quick Test Commands
-
-### 1. Health Check
-```bash
-curl http://127.0.0.1:8000/api/health
+## 🔗 Base URL
+```
+http://127.0.0.1:8000/api
 ```
 
-### 2. Login
+## 🔐 Autentikasi
+
+### Login
+```bash
+POST /api/login
+Content-Type: application/json
+
+{
+  "email": "user1@mail.com",
+  "kata_sandi": "password123"
+}
+```
+
+### Gunakan Token
+```bash
+Authorization: Bearer {token-jwt-anda}
+```
+
+## 📦 Produk
+
+### Daftar Semua Produk
+```bash
+GET /api/produk
+```
+
+### Detail Produk
+```bash
+GET /api/produk/{id}
+```
+
+### Buat Produk (Terproteksi)
+```bash
+POST /api/produk
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "nama": "Produk Baru",
+  "harga": 500000,
+  "sku": "PRD-001",
+  "stok": 100,
+  "kategori_id": 1
+}
+```
+
+## 🛒 Pesanan
+
+### Daftar Pesanan Pengguna (Terproteksi)
+```bash
+GET /api/pesanan
+Authorization: Bearer {token}
+```
+
+### Buat Pesanan (Terproteksi)
+```bash
+POST /api/pesanan
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "product_id": 1,
+  "qty": 2,
+  "courier": "JNE",
+  "address": "Jl. Contoh No. 123"
+}
+```
+
+## 🚚 Monitoring (Terproteksi)
+
+### Monitoring Pengiriman
+```bash
+GET /api/monitoring-pengiriman
+Authorization: Bearer {token}
+```
+
+### Log Audit
+```bash
+GET /api/audit-logs
+Authorization: Bearer {token}
+```
+
+## 🧪 Pengujian Cepat
+
+### 1. Login
 ```bash
 curl -X POST http://127.0.0.1:8000/api/login \
   -H "Content-Type: application/json" \
-  -d "{\"email\":\"user1@mail.com\",\"kata_sandi\":\"password123\"}"
+  -d '{"email":"user1@mail.com","kata_sandi":"password123"}'
 ```
 
-### 3. Get Products
+### 2. Dapatkan Produk
 ```bash
 curl http://127.0.0.1:8000/api/produk
 ```
 
-### 4. Get Profile (with token)
-```bash
-curl http://127.0.0.1:8000/api/me \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
-
-### 5. Create Order (with token)
+### 3. Buat Pesanan
 ```bash
 curl -X POST http://127.0.0.1:8000/api/pesanan \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Authorization: Bearer TOKEN_ANDA" \
   -H "Content-Type: application/json" \
-  -d "{\"product_id\":1,\"qty\":1,\"courier\":\"JNE\",\"address\":\"Jl. Test\"}"
+  -d '{"product_id":1,"qty":1,"courier":"JNE","address":"Alamat Uji"}'
 ```
 
-## 🔑 Test Accounts
-- Email: `user1@mail.com` to `user100@mail.com`
-- Password: `password123`
+## 📚 Dokumentasi Lengkap
 
-## 📚 Full Documentation
-See [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) for complete details.
+Lihat `docs/API_DOCUMENTATION.md` untuk referensi lengkap.

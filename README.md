@@ -4,6 +4,333 @@
   <img src="https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
   <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
   <img src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white" alt="JWT">
+</p>
+
+## 📖 Tentang Proyek
+
+**Basidut** adalah sistem e-commerce enterprise yang dibangun untuk **Tugas Besar Basis Data Lanjut**. Proyek ini mengimplementasikan fitur-fitur advanced database seperti Stored Procedure, Trigger, Function, View, dan Transaction ACID dengan fokus pada **API backend** yang dapat diuji melalui Postman.
+
+### 🎯 Fokus Implementasi
+
+✅ **Database Schema** - 10+ entitas dengan normalisasi 3NF  
+✅ **Advanced Features** - Stored Procedure, Trigger, Function, View  
+✅ **REST API** - 15 endpoints dengan JWT authentication  
+✅ **Performance Testing** - 1000+ rows untuk optimasi query  
+✅ **Backup Strategy** - mysqldump dengan automasi  
+
+---
+
+## 🚀 Quick Start
+
+### 1. Install Dependencies
+```bash
+composer install
+npm install
+```
+
+### 2. Setup Environment
+```bash
+cp .env.example .env
+php artisan key:generate
+php artisan jwt:secret
+```
+
+Edit `.env`:
+```env
+DB_CONNECTION=mysql
+DB_DATABASE=basidut
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+### 3. Run Migration & Seeding
+```bash
+php artisan migrate:fresh --seed
+```
+
+### 4. Start Server
+```bash
+php artisan serve
+```
+
+### 5. Test API
+Import `docs/Basidut_API_Collection.postman_collection.json` ke Postman dan mulai testing!
+
+---
+
+## 📚 Dokumentasi Lengkap
+
+### 📋 Getting Started
+- **[MIGRATION_GUIDE.md](docs/MIGRATION_GUIDE.md)** - Setup database & migration
+- **[DATABASE_SETUP.md](docs/DATABASE_SETUP.md)** - Database configuration
+
+### 🔌 API Documentation
+- **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)** - Complete API reference dengan JWT details
+- **[API_TESTING_GUIDE.md](docs/API_TESTING_GUIDE.md)** - Testing scenarios
+- **[API_QUICK_REFERENCE.md](docs/API_QUICK_REFERENCE.md)** - Quick reference
+- **[POSTMAN_IMPORT_GUIDE.md](docs/POSTMAN_IMPORT_GUIDE.md)** - Cara import & test Postman
+
+### 🎯 Testing & Performance
+- **[PERFORMANCE_TESTING.md](docs/PERFORMANCE_TESTING.md)** - Query optimization & 1000+ rows
+- **[TESTING_PACKAGE_README.md](docs/TESTING_PACKAGE_README.md)** - Complete testing package
+
+### 💾 Backup & Maintenance
+- **[BACKUP_STRATEGY.md](docs/BACKUP_STRATEGY.md)** - mysqldump strategy & automation
+
+### ✅ Checklist
+- **[TB_CHECKLIST.md](.gemini/antigravity/brain/d2e08e1d-a819-479e-909b-fb69e8b8667f/TB_CHECKLIST.md)** - Verifikasi semua requirement TB
+
+---
+
+## ✨ Fitur Utama
+
+### 🔐 Autentikasi & Keamanan
+- **JWT Authentication** dengan algoritma HS256 (HMAC-SHA256)
+- **Bcrypt Password Hashing** (12 rounds)
+- **Protected API Endpoints** dengan middleware
+- **Token Expiration** otomatis
+
+### 🗄️ Advanced Database Features
+
+#### 1. Stored Procedure
+```sql
+CALL sp_buat_pesanan_enterprise(user_id, product_id, qty, courier, address, @order_id, @status);
+```
+- ✅ ACID Transaction (BEGIN/COMMIT/ROLLBACK)
+- ✅ Row Locking (FOR UPDATE)
+- ✅ Stock Validation
+- ✅ Multi-table Insert
+
+#### 2. Trigger
+```sql
+trg_audit_stok_update -- Auto-logs stock changes
+```
+
+#### 3. Function
+```sql
+SELECT hitung_total_pesanan(1) as total;
+```
+
+#### 4. View
+```sql
+SELECT * FROM v_monitoring_pengiriman;
+```
+
+### 📊 Database Schema
+
+```
+kategori (1) ──< produk (N)
+                   │
+                   │ (N)
+                   ↓
+pengguna (1) ──< pesanan (N) ──< item_pesanan (N)
+                   │
+                   │ (1)
+                   ↓
+              pengiriman (1)
+                   │
+                   ↓
+              log_audit (audit trail)
+```
+
+**8 Main Tables:**
+- `kategori` - Product categories
+- `pengguna` - Users (bcrypt passwords)
+- `produk` - Products with constraints
+- `pesanan` - Orders
+- `item_pesanan` - Order items
+- `pengiriman` - Shipping
+- `log_audit` - Audit logs
+- `metode_pembayaran` - Payment methods
+
+---
+
+## 🔌 API Endpoints (15 Total)
+
+### Public Endpoints (5)
+- `POST /api/register` - Register user
+- `POST /api/login` - Login & get JWT token
+- `GET /api/produk` - List products
+- `GET /api/produk/{id}` - Product details
+- `GET /api/health` - Health check
+
+### Protected Endpoints (10) - Requires JWT
+- `GET /api/me` - User profile
+- `POST /api/logout` - Logout
+- `POST /api/produk` - Create product
+- `PUT /api/produk/{id}` - Update product
+- `DELETE /api/produk/{id}` - Delete product
+- `GET /api/pesanan` - User's orders
+- `GET /api/pesanan/{id}` - Order details
+- `POST /api/pesanan` - Create order (stored procedure)
+- `GET /api/monitoring-pengiriman` - Shipping monitoring (view)
+- `GET /api/audit-logs` - Audit logs (trigger)
+
+**Lihat:** [API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) untuk detail lengkap
+
+---
+
+## 🧪 Testing
+
+### Import Postman Collection
+```bash
+File → Import → docs/Basidut_API_Collection.postman_collection.json
+```
+
+### Test Credentials
+- Email: `user1@mail.com` to `user100@mail.com`
+- Password: `password123`
+
+### Quick Test
+```bash
+# Login
+curl -X POST http://127.0.0.1:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user1@mail.com","kata_sandi":"password123"}'
+
+# Get products
+curl http://127.0.0.1:8000/api/produk
+```
+
+**Lihat:** [POSTMAN_IMPORT_GUIDE.md](docs/POSTMAN_IMPORT_GUIDE.md) untuk panduan lengkap
+
+---
+
+## 📈 Performance Testing
+
+### Seed 1000+ Rows
+```bash
+php artisan db:seed --class=PerformanceTestSeeder
+```
+
+**Creates:**
+- 1000 products
+- 500 orders
+- 1500+ order items
+- **Total: 3000+ rows**
+
+**Lihat:** [PERFORMANCE_TESTING.md](docs/PERFORMANCE_TESTING.md) untuk query optimization
+
+---
+
+## 💾 Backup & Restore
+
+### Full Backup
+```bash
+mysqldump -u root -p --routines --triggers basidut > backup/basidut_backup.sql
+```
+
+### Restore
+```bash
+mysql -u root -p basidut < backup/basidut_backup.sql
+```
+
+**Lihat:** [BACKUP_STRATEGY.md](docs/BACKUP_STRATEGY.md) untuk strategi lengkap
+
+---
+
+## 🛠️ Teknologi
+
+- **Backend:** Laravel 11
+- **Database:** MySQL 8.0
+- **Authentication:** JWT (tymon/jwt-auth) - HS256 algorithm
+- **Password:** Bcrypt (12 rounds)
+- **API:** RESTful JSON
+- **Testing:** Postman
+
+---
+
+## 📁 Struktur Proyek
+
+```
+basidut/
+├── app/
+│   ├── Http/Controllers/Api/    # API Controllers
+│   └── Models/                   # Eloquent Models
+├── database/
+│   ├── migrations/               # 9 migration files
+│   └── seeders/                  # 5 seeder files
+├── routes/
+│   ├── api.php                   # 15 API endpoints
+│   └── web.php                   # Web routes
+├── docs/                         # 📚 Complete documentation
+│   ├── API_DOCUMENTATION.md
+│   ├── MIGRATION_GUIDE.md
+│   ├── PERFORMANCE_TESTING.md
+│   ├── BACKUP_STRATEGY.md
+│   └── Basidut_API_Collection.postman_collection.json
+└── README.md                     # This file
+```
+
+---
+
+## ✅ TB Requirements Checklist
+
+### Database
+- ✅ 10+ entitas (12 tables)
+- ✅ Relasi 1-1, 1-N, N-N
+- ✅ Normalisasi 3NF
+- ✅ Primary Key, Foreign Key, Unique, Index, CHECK
+
+### Advanced Features
+- ✅ Stored Procedure (`sp_buat_pesanan_enterprise`)
+- ✅ Function (`hitung_total_pesanan`)
+- ✅ Trigger (`trg_audit_stok_update`)
+- ✅ View (`v_monitoring_pengiriman`)
+- ✅ Transaction (ACID)
+
+### API & Testing
+- ✅ 3+ modul CRUD
+- ✅ JOIN & Subquery
+- ✅ Testable via Postman
+- ✅ 1000+ rows performance data
+
+### Security & Backup
+- ✅ JWT Authentication (HS256)
+- ✅ Bcrypt Password Hashing
+- ✅ mysqldump Backup Strategy
+- ✅ Audit Logging
+
+**Lihat:** [TB_CHECKLIST.md](.gemini/antigravity/brain/d2e08e1d-a819-479e-909b-fb69e8b8667f/TB_CHECKLIST.md) untuk detail lengkap
+
+---
+
+## 🎓 Untuk Presentasi TB
+
+### Demo Flow
+1. **Database Schema** - Show ERD & migrations
+2. **Advanced Features** - Demo stored procedure, trigger, view
+3. **API Testing** - Live demo via Postman
+4. **Performance** - Show query optimization with 1000+ rows
+5. **Backup** - Demo backup/restore strategy
+
+### Key Points
+- ✅ Complete CRUD API dengan JWT
+- ✅ Stored procedure dengan ACID transaction
+- ✅ Automatic audit logging via trigger
+- ✅ Real-time monitoring via view
+- ✅ Query optimization dengan indexing
+- ✅ Comprehensive backup strategy
+
+---
+
+## 📞 Support
+
+Untuk pertanyaan atau issue, lihat dokumentasi di folder `docs/` atau check:
+- [API Documentation](docs/API_DOCUMENTATION.md)
+- [Migration Guide](docs/MIGRATION_GUIDE.md)
+- [Testing Guide](docs/POSTMAN_IMPORT_GUIDE.md)
+
+---
+
+**Tugas Besar Basis Data Lanjut - Ready for Presentation! 🚀**
+
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+  <img src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
 </p>
 
 ## 📖 Tentang Proyek
