@@ -104,7 +104,10 @@ CALL sp_buat_pesanan_enterprise(user_id, product_id, qty, courier, address, @ord
 
 #### 2. Trigger
 ```sql
-trg_audit_stok_update -- Auto-logs stock changes
+-- 3 Triggers untuk audit logging lengkap:
+trg_audit_stok_update      -- Mencatat UPDATE stok
+trg_audit_produk_insert    -- Mencatat INSERT produk baru
+trg_audit_produk_delete    -- Mencatat DELETE produk
 ```
 
 #### 3. Function
@@ -276,7 +279,7 @@ basidut/
 ### Advanced Features
 - ✅ Stored Procedure (`sp_buat_pesanan_enterprise`)
 - ✅ Function (`hitung_total_pesanan`)
-- ✅ Trigger (`trg_audit_stok_update`)
+- ✅ Triggers (3): `trg_audit_stok_update`, `trg_audit_produk_insert`, `trg_audit_produk_delete`
 - ✅ View (`v_monitoring_pengiriman`)
 - ✅ Transaction (ACID)
 

@@ -54,7 +54,7 @@ App\Models\Produk::count(); // Seharusnya 3
 // Periksa stored procedure ada
 DB::select("SHOW PROCEDURE STATUS WHERE Db = 'basidut'");
 
-// Periksa trigger ada
+// Periksa trigger ada (seharusnya 3 triggers)
 DB::select("SHOW TRIGGERS WHERE `Table` = 'produk'");
 
 // Periksa view ada
@@ -75,7 +75,10 @@ DB::select("SHOW FULL TABLES WHERE Table_Type = 'VIEW'");
 
 ### Fitur Advanced (4)
 1. **Stored Procedure**: `sp_buat_pesanan_enterprise` - Membuat pesanan dengan transaksi ACID
-2. **Trigger**: `trg_audit_stok_update` - Mencatat perubahan stok secara otomatis
+2. **Triggers** (3 buah):
+   - `trg_audit_stok_update` - Mencatat perubahan stok (UPDATE)
+   - `trg_audit_produk_insert` - Mencatat penambahan produk (INSERT)
+   - `trg_audit_produk_delete` - Mencatat penghapusan produk (DELETE)
 3. **Function**: `hitung_total_pesanan` - Menghitung total pesanan
 4. **View**: `v_monitoring_pengiriman` - Monitoring pengiriman
 
@@ -214,7 +217,7 @@ pengguna (1) ──< pesanan (N) ──< item_pesanan (N)
 Setelah menjalankan migrasi, verifikasi:
 - [ ] Semua 8 tabel dibuat
 - [ ] Stored procedure `sp_buat_pesanan_enterprise` ada
-- [ ] Trigger `trg_audit_stok_update` ada
+- [ ] Triggers ada (3 buah: update, insert, delete)
 - [ ] Function `hitung_total_pesanan` ada
 - [ ] View `v_monitoring_pengiriman` ada
 - [ ] 101 pengguna di-seed dengan password bcrypt

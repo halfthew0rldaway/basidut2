@@ -10,7 +10,7 @@ return new class extends Migration
      * 
      * This migration creates advanced database features:
      * 1. Stored Procedure: sp_buat_pesanan_enterprise
-     * 2. Trigger: trg_audit_stok_update
+     * 2. Triggers: trg_audit_stok_update, trg_audit_produk_insert, trg_audit_produk_delete
      * 3. Function: hitung_total_pesanan
      * 4. View: v_monitoring_pengiriman
      */
@@ -78,8 +78,10 @@ return new class extends Migration
         ");
 
         // ====================================================================
-        // 2. TRIGGER: trg_audit_stok_update
+        // 2. TRIGGERS: Audit Logging (UPDATE, INSERT, DELETE)
         // ====================================================================
+        
+        // 2.1 TRIGGER: trg_audit_stok_update
         // Automatically logs stock changes to log_audit table
         DB::unprepared("
             DROP TRIGGER IF EXISTS trg_audit_stok_update;
@@ -90,9 +92,65 @@ return new class extends Migration
             BEGIN
                 -- Hanya catat jika stok berubah
                 IF OLD.stok <> NEW.stok THEN
-                    INSERT INTO log_audit (nama_tabel, id_record, aksi, keterangan)
-                    VALUES ('produk', OLD.id, 'UPDATE', CONCAT('Stok berubah dari ', OLD.stok, ' menjadi ', NEW.stok));
+                    INSERT INTO log_audit (nama_tabel, id_record, aksi, keterangan, user_pelaku, waktu)
+                    VALUES ('produk', OLD.id, 'UPDATE', CONCAT('Stok berubah dari ', OLD.stok, ' menjadi ', NEW.stok), 'SYSTEM', CURRENT_TIMESTAMP);
                 END IF;
+            END
+        ");
+
+        // 2.2 TRIGGER: trg_audit_produk_insert
+        // Automatically logs product insertions
+        DB::unprepared("
+            DROP TRIGGER IF EXISTS trg_audit_produk_insert;
+            
+            CREATE TRIGGER trg_audit_produk_insert
+            AFTER INSERT ON produk
+            FOR EACH ROW
+            BEGIN
+                INSERT INTO log_audit (
+                    nama_tabel, 
+                    id_record, 
+                    aksi, 
+                    keterangan, 
+                    user_pelaku, 
+                    waktu
+                )
+                VALUES (
+                    'produk',
+                    NEW.id,
+                    'INSERT',
+                    CONCAT('Menambah produk baru: ', NEW.nama, ' dengan stok: ', NEW.stok),
+                    'SYSTEM',
+                    CURRENT_TIMESTAMP
+                );
+            END
+        ");
+
+        // 2.3 TRIGGER: trg_audit_produk_delete
+        // Automatically logs product deletions
+        DB::unprepared("
+            DROP TRIGGER IF EXISTS trg_audit_produk_delete;
+            
+            CREATE TRIGGER trg_audit_produk_delete
+            AFTER DELETE ON produk
+            FOR EACH ROW
+            BEGIN
+                INSERT INTO log_audit (
+                    nama_tabel, 
+                    id_record, 
+                    aksi, 
+                    keterangan, 
+                    user_pelaku, 
+                    waktu
+                )
+                VALUES (
+                    'produk',
+                    OLD.id,
+                    'DELETE',
+                    CONCAT('Menghapus produk: ', OLD.nama, ' (Stok terakhir: ', OLD.stok, ')'),
+                    'SYSTEM',
+                    CURRENT_TIMESTAMP
+                );
             END
         ");
 
@@ -148,6 +206,8 @@ return new class extends Migration
     {
         DB::unprepared("DROP VIEW IF EXISTS v_monitoring_pengiriman");
         DB::unprepared("DROP FUNCTION IF EXISTS hitung_total_pesanan");
+        DB::unprepared("DROP TRIGGER IF EXISTS trg_audit_produk_delete");
+        DB::unprepared("DROP TRIGGER IF EXISTS trg_audit_produk_insert");
         DB::unprepared("DROP TRIGGER IF EXISTS trg_audit_stok_update");
         DB::unprepared("DROP PROCEDURE IF EXISTS sp_buat_pesanan_enterprise");
     }
